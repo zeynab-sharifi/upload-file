@@ -18,21 +18,35 @@
                     </div>
                     <button class="btn btn-danger">submit</button>
                 </form>
+                <div class="progress-bar-upload mt-3 d-none">
+                    <div class="progress">
+                        <div class="progress-bar" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">0%</div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
     <script>
         const form = document.querySelector('#form')
-        
+        const progress = document.getElementsByClassName('progress-bar-upload')
+        const progerssBar = progress.querySelector('.progress-bar')
+
 
         form.addEventListener('submit' , function(event){
             event.preventDefault();
+            
+
             let file = this.querySelector(`#fileupload`).file[0]
             if(file){
+
+                // remove display-none progress
+                progress.classList.remove('d-none');
+                
                 let formData = new FormData();
                 formData.append('file' , file);
 
                 let ajax = new XMLHttpRequest();
+                ajax.upload.addEventListener('progress' , progressHand);
                 ajax.addEventListener('load', completHandler)
 
 
@@ -40,6 +54,12 @@
                 ajax.send(formdata)
             }
         })
+
+        function progressHand(event){
+            let percent = Math.round((event.loaded / event.total) * 100);
+            progerssBar.style.width = `${percent}%`
+            progerssBar.innerHTML = `${percent}%`
+        }
 
         function completHandler(){
             console.log('complete')
